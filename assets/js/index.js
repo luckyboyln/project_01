@@ -1,9 +1,9 @@
 $(function () {
 
-
+    var layer = layui.layer
     //调用getUserInfo函数获取用户的基本信息
     getUserInfo();
-    var layer = layui.layer
+
     //实现点击退出按钮功能
     $('#btnLogout').on('click', function () {
         layer.confirm('确定要离开了嘛?', {
