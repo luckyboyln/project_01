@@ -32,6 +32,7 @@ $(function () {
         });
     })
 
+
     //给动态添加上去得form-add表单代理submit事件
     //然后请求服务器，把数据提交上去再渲染页面
     $('body').on('submit', '#form-add', function (e) {
@@ -94,7 +95,76 @@ $(function () {
         })
     })
 
-    //
+    var delAllLength = 0;
+    var hasDel = 0;
+    //给删除所有按钮添加点击事件
+    $('#btnDelCate').on('click', function () {
+        layer.confirm('确认删除所有吗？？？', {
+            icon: 5,
+            title: '提示'
+        }, function (index) {
+            //do something
+            $.ajax({
+                method: 'get',
+                url: '/my/article/cates',
+                success: function (res) {
+                    var idList = []
+                    $.each(res.data, function (index, value) {
+                        idList.push(value.Id)
+                    })
+                    // console.log(idList);
+                    //获取所有id号的数组，然后循环删除
+                    delAllLength = idList.length - 2;
+                    hasDel = 0;
+                    for (var i = 2; i < idList.length - 2; i++) {
+                        delAllcate(idList[i]);
+                    }
+                }
+            })
+            layer.close(index);
+        });
+
+        // $.ajax({
+        //     method: 'get',
+        //     url: '/my/article/cates',
+        //     success: function (res) {
+        //         var idList = []
+        //         $.each(res.data, function (index, value) {
+        //             idList.push(value.Id)
+
+        //         })
+        //         // console.log(idList);
+        //         //获取所有id号的数组，然后循环删除
+        //         delAllLength = idList.length - 2;
+        //         hasDel = 0;
+        //         for (var i = 2; i < idList.length - 2; i++) {
+        //             delAllcate(idList[i]);
+        //         }
+        //     }
+        // })
+
+        function delAllcate(id) {
+            $.ajax({
+                method: 'GET',
+                url: '/my/article/deletecate/' + id,
+                success: function (res) {
+                    hasDel++
+                    if (res.status !== 0) {
+                        return layer.msg(res.message)
+                    }
+                    if (hasDel == delAllLength) {
+                        initArticleList();
+                        // window.location.reload(true)
+                        // self.opener.location.reload(true);
+                    }
+                }
+            })
+        }
+    })
+
+
+
+
     $('tbody').on("click", '.btn-delete', function () {
         var id = $(this).attr("data-id")
         $.ajax({
