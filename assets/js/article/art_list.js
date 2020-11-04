@@ -85,8 +85,54 @@ $(function () {
                 ,
             count: total, //数据总数，从服务端得到
             limit: q.pagesize,
-            curr: q.cate_id
+            curr: q.pagenum,
+            layout: ['count', 'limit', 'prev', 'page', 'next', 'skip'], //自定义分页区域样式
+            limits: [2, 3, 5, 10],
+            //当分页发生切换时，就会触发jump回调函数
+            jump: function (obj, first) {
+                // console.log(obj.curr)
+                //把最新的页码值传给q，再去发起请求获取数据渲染页面
+                q.pagenum = obj.curr
+                //把最新的页码条数传给q，再去发起请求获取数据渲染页面
+                q.pagesize = obj.limit
+                // initTable()  直接调用该方法会出现死循环
+                //如何解决
+                if (!first) {
+                    //do something
+                    initTable()
+                }
+            }
         })
     }
+
+    // 通过代理的方式为动态添加的删除按钮绑定事件
+    $('tbody').on('click', '.btn-delete', function () {
+        var len = $('.btn-delete').length
+        var id = $(this).attr('data-id')
+        layer.confirm('确定删除吗?', {
+            icon: 5,
+            title: '提示'
+        }, function (index) {
+            $.ajax({
+                method: 'get',
+                url: '/my/article/delete/' + id,
+                success: function (res) {
+                    if (res.status !== 0) {
+                        return layer.msg('删除文章失败！')
+                    }
+                    layer.msg('删除文章成功！')
+
+                    if (len === 1) {
+                        // 页码值最小必须是1
+                        q.pagenum = q.pagenum === 1 ? 1 : q.pagenum - 1
+                    }
+                    initTable()
+                }
+            })
+            //do something
+
+            layer.close(index);
+        });
+    })
 
 })
